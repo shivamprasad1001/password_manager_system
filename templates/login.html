@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Password Manager</title>
+    <link rel="stylesheet" href="/static/styles/login.css">
+</head>
+<body>
+    
+    <div class="login-container">
+        
+        <h2>🔐 Login</h2>
+        <form method="POST">
+            
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" id="password" required>
+            <button type="submit">Login</button><br>
+            <a class="registar-link" href="#" onclick="regAlt()">new user</a>
+            
+        </form>
+    </div>
+</body>
+<script>
+    function regAlt(){
+        alert("This is high secure system so you can't add new user");
+        
+    }
+
+</script>
+</html>

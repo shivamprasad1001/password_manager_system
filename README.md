@@ -5,7 +5,6 @@ A simple and secure **Password Manager** built with **Flask** and **HTML/CSS/Jav
   <img src="https://github.com/shivamprasad1001/password_manager_system/blob/main/static/demo/index.png?raw=true" width="30%" />
   <img src="https://github.com/shivamprasad1001/password_manager_system/blob/main/static/demo/register.png?raw=true" width="30%" />
 </p>
----
 
 ## 🚀 Features  
 ✅ **Offline Mode** – Works without an internet connection.  

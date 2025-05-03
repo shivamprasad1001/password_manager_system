@@ -1,8 +1,10 @@
 # 🔐 Password Manager  
 A simple and secure **Password Manager** built with **Flask** and **HTML/CSS/JavaScript**. It allows users to store, retrieve, and manage passwords for different websites/apps securely.  
-
-![Password Manager UI](https://github.com/shivamprasad1001/Password-Maneger-System/blob/main/demo1.png)  
-
+<p align="center">
+  <img src="https://github.com/shivamprasad1001/password_manager_system/blob/main/static/demo/login.png?raw=true" width="30%" />
+  <img src="https://github.com/shivamprasad1001/password_manager_system/blob/main/static/demo/index.png?raw=true" width="30%" />
+  <img src="https://github.com/shivamprasad1001/password_manager_system/blob/main/static/demo/register.png?raw=true" width="30%" />
+</p>
 ---
 
 ## 🚀 Features  

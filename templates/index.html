@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePass Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/styles/index.css">
+
+</head>
+
+<body>
+    <!-- Audio for the notification/alert massage -->
+    <audio id="flash-audio" src="{{ url_for('static', filename='audio/flash.mp3') }}"></audio>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Confirm Delete</h2>
+            <form method="POST" action="/delete-password" onsubmit="return validateDeleteForm()">
+
+                <input type="hidden" name="password_id" id="delete_id">
+
+                <label for="admin_username">Admin Username</label>
+                <input type="text" name="admin_username" id="admin_username" required>
+
+                <label for="admin_password">Admin Password</label>
+                <input type="password" name="admin_password" id="admin_password" required>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="confirm_checkbox">
+                    <span class="custom-check"></span>
+                    Once deleted, this password cannot be retrieved. Please confirm.
+                </label>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i>Confirm Delete</button>
+
+                    <button type="button" onclick="closeDeleteModal()" class="btn btn-danger"><i
+                            class="fas fa-times"></i> Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="container" id="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="user-box">
+                <div class="avatar">{{ username[0] | upper }}</div>
+                <div class="welcome-text">
+                    <h1 class="welcome-message">
+                        {{ greeting }}, <span class="user-name" style="color: {{ color }}">{{ username | title }}</span>
+                        <span class="badge">{{ role }}</span>
+                    </h1>
+                </div>
+            </div>
+
+
+            <div class="user-actions">
+                <button class="btn btn-outline" onclick="syncPasswords()" style="display: none;">
+                    <i class="fas fa-sync-alt"></i> Sync
+                </button>
+                <button class="btn btn-danger" onclick="window.location.href='{{ url_for('logout') }}'">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+            </div>
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-popup flash-{{ category }}">
+                    {{ message }}
+                    <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Total Passwords</h3>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ total_passwords }}</div>
+                <div class="stat-text">Passwords stored securely</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Security Score</h3>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-number">94%</div>
+                <div class="stat-text">Excellent password strength</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Recent Activity</h3>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ recent_passwords|length }}</div>
+                <div class="stat-text">Updates in last 24 hours</div>
+            </div>
+        </div>
+
+        <!-- Add Password Form -->
+        <div class="password-form">
+            <h2>Add New Password</h2>
+            <form id="addPasswordForm" action="{{ url_for('add_password') }}" method="POST">
+                <div class="form-group">
+                    <label for="salt">Website/App Name</label>
+                    <input type="text" id="service_name" name="salt" class="form-control"
+                        placeholder="e.g. Google, GitHub">
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username/Email</label>
+                    <input type="text" id="service_username" name="username" class="form-control"
+                        placeholder="Enter username or email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Enter password" required>
+                        <span class="password-toggle" id="toggle-password" onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="password-actions">
+                        <button type="button" class="btn btn-outline" onclick="generatePassword()">
+                            <i class="fas fa-dice"></i> Generate
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="clearPassword()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Password
+                </button>
+            </form>
+        </div>
+
+        <!-- Passwords Table -->
+        <div class="passwords-table">
+            <div class="table-header">
+                <h2>Stored Passwords</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" id="search-passwords" placeholder="Search passwords...">
+                </div>
+            </div>
+            <div class="table-container">
+                    <table class="password-table">
+                        <thead>
+                        <tr>
+                            <th>Website/App</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for entry in passwords %}
+                        <tr>
+                            <td>{{ entry.salt or 'N/A' }}</td>
+                            <td>
+                            {{ entry.username }}
+                            <button class="btn-icon" onclick="copyToClipboard('{{ entry.username }}')" title="Copy Username">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            </td>
+                            <td class="password-cell">
+                            <span id="password-{{ entry.id }}" class="password-mask">••••••••</span>
+                            <span class="password-text" style="display:none">{{ entry.password }}</span>
+                            <button class="btn-icon" onclick="togglePasswordVisibility('{{ entry.id }}')" title="Show/Hide">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="copyToClipboard('{{ entry.password }}')" title="Copy Password">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            </td>
+                            <td class="action-cell">
+                            <a href="{{ url_for('edit_password', id=entry.id) }}" class="btn-icon" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" onclick="openDeleteModal({{ entry.id }})" class="btn-icon delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+
+        </div>
+    </div>
+
+
+    <script src="/static/js/adminAuth.js"></script>
+    <script>
+        // Toggle password visibility in form
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-password').querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Toggle password visibility in table
+        function togglePasswordVisibility(id) {
+            const passwordSpan = document.getElementById(`password-${id}`);
+            const passwordText = passwordSpan.nextElementSibling;
+            const toggleIcon = passwordSpan.parentElement.querySelector('.fa-eye');
+
+            if (passwordSpan.style.display === 'none') {
+                passwordSpan.style.display = 'inline';
+                passwordText.style.display = 'none';
+                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                passwordSpan.style.display = 'none';
+                passwordText.style.display = 'inline';
+                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        }
+
+        // Generate random password
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('password').value = password;
+            document.getElementById('password').type = 'text';
+            document.getElementById('toggle-password').querySelector('i').classList.replace('fa-eye', 'fa-eye-slash');
+        }
+
+        // Clear password field
+        function clearPassword() {
+            document.getElementById('password').value = '';
+            document.getElementById('password').type = 'password';
+            document.getElementById('toggle-password').querySelector('i').classList.replace('fa-eye-slash', 'fa-eye');
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showFlash('Copied to clipboard!', 'success')
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Search passwords
+        document.getElementById('search-passwords').addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const serviceName = row.cells[0].textContent.toLowerCase();
+                const username = row.cells[1].textContent.toLowerCase();
+                if (serviceName.includes(searchTerm) || username.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+
+        // Set initial theme
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const icon = themeToggle.querySelector('i');
+
+            if (currentTheme === 'dark') {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+
+        // Sync passwords (placeholder)
+        function syncPasswords() {
+            alert('Syncing passwords...');
+            // Implement actual sync logic
+        }
+
+
+        // Hide flash messages automatically after 4 seconds
+        window.addEventListener("DOMContentLoaded", () => {
+            const flashAudio = document.getElementById("flash-audio");
+            const flashes = document.querySelectorAll(".flash-popup");
+
+            if (flashes.length > 0 && flashAudio) {
+                flashAudio.play().catch(err => console.log("Audio blocked:", err));
+            }
+
+            // Auto-hide flash messages
+            setTimeout(() => {
+                flashes.forEach(el => el.style.display = "none");
+            }, 4000);
+        });
+        function showFlash(message, type = "info") {
+            const flash = document.createElement("div");
+            flash.className = `flash-popup flash-${type}`;
+            flash.innerHTML = `
+        ${message}
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+    `;
+
+            const container = document.querySelector(".flash-container") || createFlashContainer();
+            container.appendChild(flash);
+
+            // Play sound
+            const flashAudio = document.getElementById("flash-audio");
+            if (flashAudio) flashAudio.play().catch(err => console.warn("Audio blocked"));
+
+            // Auto-hide
+            setTimeout(() => flash.remove(), 4000);
+        }
+
+        function createFlashContainer() {
+            const container = document.createElement("div");
+            container.className = "flash-container";
+            document.body.appendChild(container);
+            return container;
+        }
+
+    </script>
+</body>
+
+</html>

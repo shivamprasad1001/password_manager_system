@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Password - SecurePass</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/styles/edit.css">
+</head>
+
+<body>
+    <div class="edit-container">
+        <div class="edit-header">
+            <h1><i class="fas fa-edit"></i> Edit Password</h1>
+        </div>
+
+        <form action="{{ url_for('update_password', id=entry.id) }}" method="POST">
+
+            <div class="form-group">
+                <label for="salt">Salt (Flag)</label>
+                <input type="text" id="salt" name="salt" class="form-control" value="{{ entry.salt }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username/Email</label>
+                <input type="text" id="username" name="username" class="form-control" value="{{ entry.username }}"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control"
+                        value="{{ entry.password }}" required>
+                    <span class="password-toggle" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="password-actions">
+                    <button type="button" class="btn btn-outline" onclick="generatePassword()">
+                        <i class="fas fa-dice"></i> Generate
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="clearPassword()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <label class="checkbox-wrapper danger-text" title="You must confirm to enable saving.">
+                <input type="checkbox" id="confirm_checkbox">
+                <span class="custom-check"></span>
+                Once deleted, this password cannot be retrieved. Please confirm.
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+
+        <a href="{{ url_for('dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Generate random password
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('password').value = password;
+            document.getElementById('password').type = 'text';
+            document.querySelector('.password-toggle i').classList.replace('fa-eye', 'fa-eye-slash');
+        }
+
+        // Clear password field
+        function clearPassword() {
+            document.getElementById('password').value = '';
+            document.getElementById('password').type = 'password';
+            document.querySelector('.password-toggle i').classList.replace('fa-eye-slash', 'fa-eye');
+        }
+
+        // checkbox 
+        const checkbox = document.getElementById('confirm_checkbox');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        // Initially disable the submit button
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+        submitBtn.style.cursor = 'not-allowed';
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        });
+    </script>
+</body>
+
+</html>

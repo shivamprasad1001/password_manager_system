@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePass Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --card-bg: #16213e;
+            --sidebar-bg: #0f3460;
+            --body-bg: #0d1b2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--light);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            padding: 20px 0;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--success);
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            color: white;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(67, 97, 238, 0.2);
+            color: white;
+            border-left: 4px solid var(--primary);
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .welcome h2 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .welcome p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 10px 15px 10px 40px;
+            color: white;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 14px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-profile .dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--card-bg);
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .user-profile:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown a:hover {
+            background: rgba(67, 97, 238, 0.2);
+            color: white;
+            padding-left: 20px;
+        }
+
+        .dropdown a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(67, 97, 238, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-text {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .password-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .password-actions button {
+            flex: 1;
+        }
+
+        /* Passwords Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(67, 97, 238, 0.2);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .salt-flag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .salt-flag.active {
+            background: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+        }
+
+        .salt-flag.inactive {
+            background: rgba(108, 117, 125, 0.2);
+            color: var(--gray);
+        }
+
+        .password-cell {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .password-mask {
+            color: var(--gray);
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon.edit {
+            background: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+        }
+
+        .btn-icon.edit:hover {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-icon.delete {
+            background: rgba(247, 37, 133, 0.2);
+            color: var(--danger);
+        }
+
+        .btn-icon.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar .logo h1, .sidebar-menu span {
+                display: none;
+            }
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-box input {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-lock"></i>
+                <h1>SecurePass</h1>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="#"><i class="fas fa-key"></i> <span>My Passwords</span></a></li>
+            <li><a href="#"><i class="fas fa-plus-circle"></i> <span>Add Password</span></a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="#"><i class="fas fa-shield-alt"></i> <span>Security</span></a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> <span>Help</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="welcome">
+                <h2>Welcome back, John!</h2>
+                <p>Last login: Today at 10:30 AM from Chrome on Windows</p>
+            </div>
+            <div class="user-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-passwords" placeholder="Search passwords...">
+                </div>
+                <button class="btn btn-outline"><i class="fas fa-sync-alt"></i> Sync</button>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=random" alt="User">
+                    <div class="dropdown">
+                        <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#"><i class="fas fa-moon"></i> Dark Mode</a>
+                        <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Passwords</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="stat-number">42</div>
+                <div class="stat-text">Passwords stored securely</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Security Score</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-number">94%</div>
+                <div class="stat-text">Excellent password strength</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Activity</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                </div>
+                <div class="stat-number">5</div>
+                <div class="stat-text">Updates in last 24 hours</div>
+            </div>
+        </div>
+
+        <!-- Add Password Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Add New Password</h3>
+                <div class="card-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+            </div>
+            
+            <form id="add-password-form">
+                <div class="form-group">
+                    <label for="salt">Salt (Flag)</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="salt" name="salt">
+                        <label for="salt">Enable salt for this password</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Username/Email</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username or email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <input type="password" id="password" class="form-control" placeholder="Enter password">
+                        <span class="password-toggle" id="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="password-actions">
+                        <button type="button" class="btn btn-outline" id="generate-password">
+                            <i class="fas fa-dice"></i> Generate
+                        </button>
+                        <button type="button" class="btn btn-outline" id="clear-password">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Password
+                </button>
+            </form>
+        </div>
+
+        <!-- Password Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3 class="card-title">Stored Passwords</h3>
+                <div class="stat-text">Showing 8 of 42 passwords</div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Salt (Flag)</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="salt-flag active">Enabled</span></td>
+                        <td>john.doe@example.com</td>
+                        <td class="password-cell">
+                            <span class="password-mask">••••••••</span>
+                            <span class="password-text" style="display:none">sEcr3tP@ss1</span>
+                        </td>
+                        <td class="action-cell">
+                            <div class="btn-icon edit" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="btn-icon edit">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon delete">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="salt-flag inactive">Disabled</span></td>
+                        <td>jane_smith</td>
+                        <td class="password-cell">
+                            <span class="password-mask">••••••••</span>
+                            <span class="password-text" style="display:none">P@ssw0rd!123</span>
+                        </td>
+                        <td class="action-cell">
+                            <div class="btn-icon edit" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="btn-icon edit">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon delete">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="salt-flag active">Enabled</span></td>
+                        <td>admin@company.com</td>
+                        <td class="password-cell">
+                            <span class="password-mask">••••••••</span>
+                            <span class="password-text" style="display:none">Adm!nP@ss2023</span>
+                        </td>
+                        <td class="action-cell">
+                            <div class="btn-icon edit" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="btn-icon edit">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon delete">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="salt-flag inactive">Disabled</span></td>
+                        <td>dev_user</td>
+                        <td class="password-cell">
+                            <span class="password-mask">••••••••</span>
+                            <span class="password-text" style="display:none">d3v3lop3r!@#</span>
+                        </td>
+                        <td class="action-cell">
+                            <div class="btn-icon edit" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="btn-icon edit">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon delete">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>SecurePass Manager v1.2.0 | © 2023 All Rights Reserved | Last Sync: Today at 11:45 AM</p>
+        </div>
+    </main>
+
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Generate random password
+        document.getElementById('generate-password').addEventListener('click', function() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            passwordInput.value = password;
+            passwordInput.setAttribute('type', 'text');
+            togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Clear password field
+        document.getElementById('clear-password').addEventListener('click', function() {
+            passwordInput.value = '';
+            passwordInput.setAttribute('type', 'password');
+            togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+        });
+
+        // Form submission
+        document.getElementById('add-password-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const saltEnabled = document.getElementById('salt').checked;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // In a real app, this would send data to the server
+            alert(`Password saved!\nUsername: ${username}\nPassword: ${password}\nSalt: ${saltEnabled ? 'Enabled' : 'Disabled'}`);
+            
+            // Reset form
+            this.reset();
+            passwordInput.setAttribute('type', 'password');
+            togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+        });
+
+        // Search functionality
+        document.getElementById('search-passwords').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const username = row.cells[1].textContent.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Toggle password visibility in table
+        function togglePasswordVisibility(button) {
+            const row = button.closest('tr');
+            const passwordCell = row.querySelector('.password-cell');
+            const mask = passwordCell.querySelector('.password-mask');
+            const text = passwordCell.querySelector('.password-text');
+            
+            if (mask.style.display === 'none') {
+                mask.style.display = 'inline';
+                text.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i>';
+            } else {
+                mask.style.display = 'none';
+                text.style.display = 'inline';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            }
+        }
+    </script>
+</body>
+</html>

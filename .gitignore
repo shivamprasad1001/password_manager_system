@@ -1,0 +1,13 @@
+# .gitignore
+*.log
+*.zip
+*.xlsx
+*.db
+__pycache__/
+*.pyc
+*.bak
+.env
+logs/
+backups/
+test-file/
+flask_session/

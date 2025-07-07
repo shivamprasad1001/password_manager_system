@@ -1,13 +1,24 @@
-# .gitignore
-*.log
-*.zip
-*.xlsx
-*.db
+# Ignore Python cache and bytecode
 __pycache__/
-*.pyc
-*.bak
-.env
-logs/
-backups/
-test-file/
+*.py[cod]
+
 flask_session/
+
+# Log files
+*.log
+
+*.xlsx
+*.bak
+
+test-file/
+*.tmp
+
+*.bat
+
+.env
+
+.vscode/
+
+
+venv/
+.env/

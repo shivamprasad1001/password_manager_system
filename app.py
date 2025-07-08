@@ -266,7 +266,6 @@ def add_password():
     return redirect(url_for('dashboard'))
 
 @app.route('/delete-password', methods=['POST'])
-@app.route('/delete-password', methods=['POST'])
 def delete_password():
     if 'user_id' not in session:
         return redirect(url_for('login'))

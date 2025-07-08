@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # MySQL Configuration
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'James'
+app.config['MYSQL_PASSWORD'] = 'YOUR PASSWORD'
 app.config['MYSQL_DB'] = 'password_manager'
 
 mysql = MySQL(app)

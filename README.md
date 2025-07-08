@@ -1,130 +1,203 @@
-# 🔐 Password Manager System
 
-A secure, locally-hosted password manager system built using **Python Flask**, with a responsive frontend using **HTML**, **CSS**, **JavaScript**, and **Bootstrap**. Passwords are stored securely in **MySQL** using hashed formats, and the system also maintains logs and backup files for recovery and auditing.
+<div align="center">
 
-## 🚀 Features
+# 🔐 Password Manager System  
+**Secure, Local, and Simple Password Storage**
 
-- 🔑 Secure login and user registration system  
-- 🧠 Passwords stored with hashing for enhanced security  
-- 💾 Local backup of saved passwords  
-- 📊 Dashboard showing total passwords, security score, and recent activity  
-- ➕ Add new passwords  
-- 👁️ View, copy, edit, and delete stored passwords  
-- 🔍 Search through stored credentials  
-- 🧪 Deletion verification with username & password  
-- 🗂️ Logs user activity for traceability
+A local password manager built with Python Flask that securely hashes your credentials, backs them up, and gives you full control via a modern web dashboard.
+
+<img src="assets/logo.png" alt="App Logo" width="200" />
+
+</div>
 
 ---
 
-## 🛠️ Tech Stack
+<p align="center">
+  <!-- Language & Framework -->
+  <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flask-Web%20Framework-000000?style=for-the-badge&logo=flask&logoColor=white" />
+  <img src="https://img.shields.io/badge/Werkzeug-Security-308446?style=for-the-badge&logo=werkzeug&logoColor=white" />
 
-| Tech / Tool         | Description                                  |
-|---------------------|----------------------------------------------|
-| ![Python](https://img.icons8.com/color/20/000000/python.png) Python | Backend programming language         |
-| ![Flask](https://img.icons8.com/ios/20/000000/flask.png) Flask      | Web framework                        |
-| ![HTML5](https://img.icons8.com/color/20/000000/html-5.png) HTML    | Markup language for UI               |
-| ![CSS3](https://img.icons8.com/color/20/000000/css3.png) CSS        | Styling                              |
-| ![JS](https://img.icons8.com/color/20/000000/javascript--v1.png) JS | Interactive frontend behavior        |
-| ![MySQL](https://img.icons8.com/ios-filled/20/000000/mysql-logo.png) MySQL | Relational database management   |
-| ![GitHub](https://img.icons8.com/ios-glyphs/20/000000/github.png) GitHub | Source control & versioning       |
+  <!-- Database -->
+  <img src="https://img.shields.io/badge/MySQL-Connector-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flask--MySQLDB-ORM-orange?style=for-the-badge" />
+
+  <!-- Security & Encryption -->
+  <img src="https://img.shields.io/badge/SHA256-Password%20Hashing-green?style=for-the-badge&logo=gnupg&logoColor=white" />
+  <img src="https://img.shields.io/badge/AES-Encryption-yellow?style=for-the-badge&logo=virustotal&logoColor=black" />
+  <img src="https://img.shields.io/badge/Base64-Encoding-grey?style=for-the-badge" />
+
+  <!-- Frontend -->
+  <img src="https://img.shields.io/badge/HTML-5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS-3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-Client%20Logic-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Bootstrap-5-purple?style=for-the-badge&logo=bootstrap&logoColor=white" />
+
+  <!-- Libraries -->
+  <img src="https://img.shields.io/badge/Pandas-Data%20Processing-150458?style=for-the-badge&logo=pandas&logoColor=white" />
+  <img src="https://img.shields.io/badge/Datetime-TimeOps-grey?style=for-the-badge&logo=clockify&logoColor=white" />
+  <img src="https://img.shields.io/badge/OS-FileOps-333333?style=for-the-badge&logo=powerbi&logoColor=white" />
+  <img src="https://img.shields.io/badge/Logging-Rotation%20Handler-blue?style=for-the-badge&logo=logstash&logoColor=white" />
+
+  <!-- Environment -->
+  <img src="https://img.shields.io/badge/Localhost-Development-lightgrey?style=for-the-badge&logo=apache&logoColor=black" />
+  <img src="https://img.shields.io/badge/Markdown-Documentation-000000?style=for-the-badge&logo=markdown&logoColor=white" />
+  <img src="https://img.shields.io/badge/GitHub-Repo-181717?style=for-the-badge&logo=github&logoColor=white" />
+</p>
+
 
 ---
 
-## ⚙️ Project Workflow
+## 📜 Overview
+
+The **Password Manager System** is a secure, locally-hosted web app that lets users register, log in, and manage their credentials in one place. Passwords are **hashed**, not stored in plain text, and users can **add**, **edit**, **delete**, and **copy** them from a beautiful dashboard. All actions are logged, and a JSON **backup** is automatically created for added reliability.
+
+---
+
+## 🌟 Features
+
+- 🔐 **User Registration & Login**  
+- 🧠 **Unique User ID System**
+- 🧾 **Hashed Password Storage (SHA256)**
+- 💾 **Automatic Backup File (JSON)**
+- 🛡️ **Secure Deletion with Re-Authentication**
+- 📊 **Password Count, Audit Log, and Dashboard**
+- ✂️ **Copy, Edit, and Delete Stored Passwords**
+
+---
+
+## 📂 Project Flow
 
 ```mermaid
 graph TD
-    A[User Visits Site] --> B{Is User Registered?}
-    B -- Yes --> C[Login Page]
-    B -- No --> D[Register New User]
-    D --> E[System Generates Unique User ID]
-    E --> C
-    C --> F[Dashboard]
+    A[Visit App] --> B{Is User Registered?}
+    B -- Yes --> C[Login]
+    B -- No --> D[Register]
+    D --> E[Generate Unique User ID]
+    C --> F[Fetch User ID from MySQL]
+    F --> G[Display Dashboard]
 
-    F --> G[View Stored Passwords]
-    F --> H[Add New Password]
-    F --> I[Edit / Copy / Delete Password]
+    G --> H[View Passwords]
+    G --> I[Add New Password]
+    G --> J[Edit/Copy/Delete]
 
-    I --> J{Delete Requested?}
-    J --> K[Verify Username + Password]
-    K --> L[Delete Password]
+    I --> K[Hash + Store in DB]
+    K --> L[Update Xlsx Backup & Logs]
 
-    H --> M[Hash & Save to MySQL]
-    M --> N[Update Backup File]
-    M --> O[Store Log]
+    J --> M{User Verified?}
+    M -- Yes --> N[Delete/Edit Action]
+    N --> L
 ````
 
 ---
 
-## 📷 Screenshots
+## 🧰 Tech Stack
 
-### 🔐 Dashboard View
-
-![Dashboard Screenshot](assets/dashboard.png)
+| Layer            | Tech/Tool                                                                                                                                                                                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend          | ![Python](https://img.icons8.com/color/25/python.png) Python, ![Flask](https://img.icons8.com/ios/25/flask.png) Flask                                                                                                                                     |
+| Frontend         | ![HTML5](https://img.icons8.com/color/25/html-5.png) HTML, ![CSS3](https://img.icons8.com/color/25/css3.png) CSS, ![JavaScript](https://img.icons8.com/color/25/javascript.png) JS, ![Bootstrap](https://img.icons8.com/color/25/bootstrap.png) Bootstrap |
+| Database         | ![MySQL](https://img.icons8.com/ios-filled/25/mysql-logo.png) MySQL                                                                                                                                                                                       |
+| Logging & Backup | Local `logs/`, `backup/passwords.json`                                                                                                                                                                                                                    |
 
 ---
 
-## 🧪 Installation & Run
+## 📸 Dashboard Preview
 
-### 🔧 Prerequisites
+<p align="center">
+  <img src="assets/dashboard.png" alt="Dashboard Screenshot" width="100%" />
+</p>
 
-* Python 3.x
-* MySQL
-* Flask (`pip install flask`)
-* Flask-MySQLdb (`pip install flask-mysqldb`)
-* Other common modules: `os`, `hashlib`, `datetime`
+---
 
-### 🖥️ Steps
+## 📁 File Structure
 
-1. **Clone the Repository**
+```
+password-manager-system/
+│
+├── static/                 # CSS, JS files
+├── templates/              # Flask HTML templates
+├── password_backup.xlsx    # Auto-generated xlsx backups
+├── password_manager.log    # Logs of user activity
+├── app.py                  # Main Flask app
+├── requirements.txt        # Python dependencies
+└── README.md
+```
 
-   ```bash
-   git clone https://github.com/yourusername/password-manager-system.git
-   cd password-manager-system
+---
+
+## 🧪 How to Run Locally
+
+### ✅ Prerequisites
+
+* Python 3.8+
+* MySQL Server
+* pip (`pip install -r requirements.txt`)
+
+### ⚙️ Setup
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/password-manager-system.git
+cd password-manager-system
+
+# Create virtual environment (optional)
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 🔧 Configure Database
+
+1. Open MySQL
+2. Create database:
+
+   ```sql
+   CREATE DATABASE password_manager;
    ```
 
-2. **Set Up the Database**
 
-   * Create a MySQL database named `password_manager`
-   * Import the `schema.sql` (if provided) or run:
+### 🚀 Run the App
 
-     ```sql
-     CREATE TABLE users (...);
-     CREATE TABLE passwords (...);
-     ```
+```bash
+python app.py
+```
 
-3. **Configure `.env` or `config.py`**
-   Add your MySQL DB credentials.
-
-4. **Run the App**
-
-   ```bash
-   python app.py
-   ```
-
-5. Open `http://localhost:5000` in your browser.
+Visit: `http://localhost:5000`
 
 ---
 
-## 🛡️ Security
+## 🔐 Security Notes
 
-* Passwords are hashed before being stored.
-* Deletion requires re-authentication.
-* Local backup ensures recovery in case of failure.
-* Logs all sensitive operations for auditing.
+* All passwords are **SHA256 hashed**
+* User authentication required for all operations
+* **Deletion is double-verified**
+* Regular **logs and JSON backups** maintained locally
 
 ---
+
+## 🚀 Future Roadmap
+
+* [ ] 🔑 Export encrypted vault
+* [ ] 📲 Mobile-friendly UI
+* [ ] 🔒 Add 2FA/MFA login option
+* [ ] 📊 Insights: weak vs strong password detection
 
 ---
 
 ## 👨‍💻 Author
 
-**Shivam Prasad**
-[GitHub](https://github.com/shivamprasad1001) • [LinkedIn](https://www.linkedin.com/in/shivamprasad1001/)
+Made with 🖤 by [**Shivam Prasad**](https://github.com/shivamprasad1001)
+🔗 Connect: [LinkedIn](https://www.linkedin.com/in/shivamprasad1001)
 
 ---
 
-## 📜 License
+## 📝 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
+---
+
+> ⭐ Star the repo if you like it. Pull requests and feedback welcome!

@@ -159,55 +159,55 @@ pip install -r requirements.txt
    ```
 3. #### 🔐 `users` Table
 
-```sql
-CREATE TABLE users (
-  id CHAR(36) NOT NULL PRIMARY KEY,
-  username VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-| Field           | Type           | Key         | Description            |
-| --------------- | -------------- | ----------- | ---------------------- |
-| `id`            | `char(36)`     | Primary Key | UUID for each user     |
-| `username`      | `varchar(255)` | Unique      | Unique username        |
-| `password_hash` | `varchar(255)` |             | SHA256 hashed password |
-| `created_at`    | `timestamp`    |             | Account creation time  |
-
----
+  ```sql
+  CREATE TABLE users (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  ```
+  
+  | Field           | Type           | Key         | Description            |
+  | --------------- | -------------- | ----------- | ---------------------- |
+  | `id`            | `char(36)`     | Primary Key | UUID for each user     |
+  | `username`      | `varchar(255)` | Unique      | Unique username        |
+  | `password_hash` | `varchar(255)` |             | SHA256 hashed password |
+  | `created_at`    | `timestamp`    |             | Account creation time  |
+  
+  ---
 
 4. #### 🔑 `passwords` Table
 
-```sql
-CREATE TABLE passwords (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  salt VARCHAR(255) NOT NULL,
-  username VARCHAR(255) NOT NULL,
-  password_hash TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  user_id CHAR(36),
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
-
-| Field           | Type           | Key         | Description                                 |
-| --------------- | -------------- | ----------- | ------------------------------------------- |
-| `id`            | `int`          | Primary Key | Auto-incremented ID for each password entry |
-| `salt`          | `varchar(255)` |             | Salt used in AES encryption                 |
-| `username`      | `varchar(255)` |             | Username of the app/site account            |
-| `password_hash` | `text`         |             | Encrypted (hashed + AES) password           |
-| `created_at`    | `timestamp`    |             | Entry creation time                         |
-| `user_id`       | `char(36)`     | Foreign Key | Links to the `users` table via `users.id`   |
-
----
+  ```sql
+  CREATE TABLE passwords (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    salt VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id CHAR(36),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+  ```
+  
+  | Field           | Type           | Key         | Description                                 |
+  | --------------- | -------------- | ----------- | ------------------------------------------- |
+  | `id`            | `int`          | Primary Key | Auto-incremented ID for each password entry |
+  | `salt`          | `varchar(255)` |             | Salt used in AES encryption                 |
+  | `username`      | `varchar(255)` |             | Username of the app/site account            |
+  | `password_hash` | `text`         |             | Encrypted (hashed + AES) password           |
+  | `created_at`    | `timestamp`    |             | Entry creation time                         |
+  | `user_id`       | `char(36)`     | Foreign Key | Links to the `users` table via `users.id`   |
+  
+  ---
 
 ### 🔄 Relationships
 
-```text
-users.id (char[36])  ←──  passwords.user_id (char[36])
-[1 User] → [Many Passwords]
-```
+  ```text
+  users.id (char[36])  ←──  passwords.user_id (char[36])
+  [1 User] → [Many Passwords]
+  ```
 
 
 
